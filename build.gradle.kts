@@ -7,6 +7,7 @@ val entryClass = "net.axay.whalewarden.ManagerKt"
 
 plugins {
     kotlin("jvm") version "1.4.32"
+    kotlin("plugin.serialization") version "1.4.32"
     application
     id ("com.github.johnrengelman.shadow") version "6.1.0"
 }
@@ -22,6 +23,9 @@ dependencies {
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
 
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
+    implementation("io.ktor:ktor-client-serialization:$ktorVersion")
+
+    implementation("org.slf4j:slf4j-simple:1.7.30")
 }
 
 java.sourceCompatibility = jvmVersion
