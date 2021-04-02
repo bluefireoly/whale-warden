@@ -23,6 +23,4 @@ fun runConfigScript() {
 
     val scriptEngine = ScriptEngineManager().getEngineByExtension("kts")
     scriptEngine.eval(scriptSource)
-
-    println(Registry.services)
 }
