@@ -3,6 +3,7 @@ FROM openjdk:11-slim as builder
 WORKDIR /gradlebuild
 COPY . .
 
+RUN chmod -R g+w ./gradlew
 RUN ./gradlew clean installShadowDist
 
 
