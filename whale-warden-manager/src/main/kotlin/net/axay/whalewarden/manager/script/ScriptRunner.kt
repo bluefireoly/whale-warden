@@ -1,7 +1,6 @@
 package net.axay.whalewarden.manager.script
 
 import net.axay.whalewarden.manager.Env
-import net.axay.whalewarden.script.registry.Registry
 import javax.script.ScriptEngineManager
 
 fun main() = runConfigScript()
