@@ -4,7 +4,6 @@ package net.axay.whalewarden.script.builder
 
 import net.axay.whalewarden.script.builder.api.Builder
 import net.axay.whalewarden.script.data.RestartPolicy
-import net.axay.whalewarden.script.data.RestartPolicy.Companion.UNLESS_STOPPED
 import net.axay.whalewarden.script.data.Service
 
 /**
