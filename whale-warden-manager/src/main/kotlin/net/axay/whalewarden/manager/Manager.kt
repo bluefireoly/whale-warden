@@ -1,4 +1,4 @@
-package net.axay.whalewarden
+package net.axay.whalewarden.manager
 
 import com.github.dockerjava.api.DockerClient
 import com.github.dockerjava.api.command.PullImageResultCallback
@@ -39,21 +39,24 @@ fun Application.mainModule() {
 
                     updateContainers
                         .mapTo(HashSet()) {
-                            println("Searching for image of container with name ${it.names}")
-                            it.imageId to it.image
+                            println("Image of container ${it.names[0]} is ${it.image}")
+                            it.image
                         }
-                        .filter { it.first != null }
                         .map {
                             launch {
-                                dockerClient.pullImageCmd(it.first!!).exec(PullImageResultCallback().awaitCompletion())
-                                println("Pulled image ${it.first} with name ${it.second}")
+                                val callback = PullImageResultCallback()
+                                dockerClient.pullImageCmd(it).exec(callback)
+                                callback.awaitStarted()
+                                println("Now pulling image with name $it...")
+                                callback.awaitCompletion()
+                                println("Pulled image with name $it")
                             }
                         }.joinAll()
 
                     updateContainers.map {
                         launch {
-                            dockerClient.stopContainerCmd(it.id).exec()
-                            println("Updated container ${it.id} with name ${it.names}")
+                            dockerClient.removeContainerCmd(it.id).exec()
+                            println("Updated container ${it.id} with name ${it.names[0]}")
                         }
                     }.joinAll()
 
