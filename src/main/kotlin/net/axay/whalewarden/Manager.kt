@@ -39,13 +39,17 @@ fun Application.mainModule() {
 
                     updateContainers
                         .mapTo(HashSet()) {
-                            println("Searching for image of container with name ${it.names}")
+                            println("Searching for image of container with name ${it.names[0]}")
                             it.imageId to it.image
                         }
                         .filter { it.first != null }
                         .map {
                             launch {
-                                dockerClient.pullImageCmd(it.first!!).exec(PullImageResultCallback().awaitCompletion())
+                                val callback = PullImageResultCallback()
+                                dockerClient.pullImageCmd(it.first!!).exec(callback)
+                                callback.awaitStarted()
+                                println("Now pulling image with name ${it.second}...")
+                                callback.awaitCompletion()
                                 println("Pulled image ${it.first} with name ${it.second}")
                             }
                         }.joinAll()
@@ -53,7 +57,7 @@ fun Application.mainModule() {
                     updateContainers.map {
                         launch {
                             dockerClient.stopContainerCmd(it.id).exec()
-                            println("Updated container ${it.id} with name ${it.names}")
+                            println("Updated container ${it.id} with name ${it.names[0]}")
                         }
                     }.joinAll()
 
