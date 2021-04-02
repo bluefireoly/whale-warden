@@ -32,12 +32,16 @@ fun Application.mainModule() {
             val token = call.parameters["token"]
             if (token == Env.webhookToken) {
                 withContext(Dispatchers.IO) {
+                    println("Listing containers")
                     val updateContainers = dockerClient.listContainersCmd()
                         .withNameFilter(Env.containerNames)
                         .exec()
 
                     updateContainers
-                        .mapTo(HashSet()) { it.imageId to it.image }
+                        .mapTo(HashSet()) {
+                            println("Searching for image of container with name ${it.names}")
+                            it.imageId to it.image
+                        }
                         .filter { it.first != null }
                         .map {
                             launch {
@@ -55,6 +59,7 @@ fun Application.mainModule() {
 
                     println("Updated all containers")
                 }
+                call.respond(HttpStatusCode.OK, "Updated containers")
             } else {
                 call.respond(HttpStatusCode.Unauthorized, "Wrong or missing token")
             }
