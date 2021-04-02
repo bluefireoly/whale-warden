@@ -5,6 +5,8 @@ package net.axay.whalewarden.script.builder
 import net.axay.whalewarden.script.builder.api.Builder
 import net.axay.whalewarden.script.data.RestartPolicy
 import net.axay.whalewarden.script.data.Service
+import net.axay.whalewarden.script.logging.logInfo
+import net.axay.whalewarden.script.registry.Registry
 
 /**
  * Builds a new service.
@@ -13,7 +15,9 @@ import net.axay.whalewarden.script.data.Service
  * @param builder the [ServiceBuilder]
  */
 inline fun service(image: String, builder: ServiceBuilder.() -> Unit) {
-    ServiceBuilder(image).apply(builder).internalBuilder.build()
+    val service = ServiceBuilder(image).apply(builder).internalBuilder.build()
+    logInfo("Built a service: $service")
+    Registry.services += service
 }
 
 class ServiceBuilder(
