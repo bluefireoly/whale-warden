@@ -25,7 +25,7 @@ services:
   whale-warden:
     image: bluefireoly/whale-warden:latest
     environment:
-      WEBHOOK_TOKEN: "YOURSECRETTOKEN" # change this, as the default ist "unset"
+      WEBHOOK_TOKEN: "YOURSECRETTOKEN"
     ports:
       - "9090:9090"
     volumes:
