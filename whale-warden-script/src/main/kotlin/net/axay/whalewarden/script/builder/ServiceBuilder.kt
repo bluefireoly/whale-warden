@@ -3,6 +3,8 @@
 package net.axay.whalewarden.script.builder
 
 import net.axay.whalewarden.script.builder.api.Builder
+import net.axay.whalewarden.script.data.RestartPolicy
+import net.axay.whalewarden.script.data.RestartPolicy.Companion.UNLESS_STOPPED
 import net.axay.whalewarden.script.data.Service
 
 /**
@@ -21,11 +23,20 @@ class ServiceBuilder(
     inner class Internal : Builder<Service> {
         val eventBuilder = EventBuilder()
 
+        val mounts = mutableListOf<Service.Mount>()
+
+        val ports = HashMap<Int, Int>()
+
+        var restartPolicy: RestartPolicy? = null
+
         override fun build() = Service(
-            image, name, tty, env, eventBuilder.internalBuilder.build()
+            image, name, tty, env, eventBuilder.internalBuilder.build(), mounts, ports, restartPolicy
         )
     }
 
+    /**
+     * INTERNAL! You probably should not use this.
+     */
     val internalBuilder = this.Internal()
 
     class EventBuilder {
@@ -40,31 +51,32 @@ class ServiceBuilder(
 
         val internalBuilder = this.Internal()
 
+        /**
+         * Executed when a container is started the first time.
+         */
         fun onFirstStart(action: () -> Unit) {
             internalBuilder.onFirstStart = action
         }
 
+        /**
+         * Executed when a container is started.
+         */
         fun onStart(action: () -> Unit) {
             internalBuilder.onStart = action
         }
 
+        /**
+         * Executed when a container is restarted.
+         */
         fun onRestart(action: () -> Unit) {
             internalBuilder.onRestart = action
         }
 
+        /**
+         * Executed when a container is stopped.
+         */
         fun onStop(action: () -> Unit) {
             internalBuilder.onStop = action
-        }
-    }
-
-    class VolumeBuilder {
-        inner class Internal : Builder<Unit> {
-
-            override fun build() = Unit
-        }
-
-        operator fun Pair<String, String>.unaryPlus() {
-
         }
     }
 
@@ -92,30 +104,35 @@ class ServiceBuilder(
     }
 
     /**
-     * Opens a scope in which you can define the assigned volumes.
+     * Adds all the specified mounts to the host configuration
+     * of the service.
      */
-    inline fun volumes(builder: VolumeBuilder.() -> Unit) {
-
-    }
-}
-
-fun main() {
-
-    service("mongo:latest") {
-        name = "mongo"
-        tty = true
-
-        env["DB_USER"] = "test"
-
-        events {
-            onStart {
-
-            }
-        }
-
-        volumes {
-            +("data" to "/data")
-        }
+    fun mounts(vararg mounts: Pair<String, String>) {
+        mounts.mapTo(internalBuilder.mounts) { Service.Mount(it.first, it.second) }
     }
 
+    /**
+     * Define multiple environment variables at once.
+     */
+    fun env(vararg variables: Pair<String, Any>) {
+       env.putAll(variables.map { it.first to it.second.toString() })
+    }
+
+    /**
+     * Define the port bindings.
+     */
+    fun ports(vararg ports: Pair<Int, Int>) {
+        internalBuilder.ports.putAll(ports)
+    }
+
+    /**
+     * Define the restart policy.
+     *
+     * @param maxRetryAmount the maximum amount of retries until docker
+     * will give up to restart the container (null for unlimited or undefined)
+     */
+    fun restart(policy: RestartPolicy, maxRetryAmount: Int? = null) {
+        internalBuilder.restartPolicy =
+            RestartPolicy(policy.name, maxRetryAmount ?: policy.maximumRetryCount)
+    }
 }
