@@ -1,24 +1,26 @@
-service("mongo:latest") {
-    name = "mongodb"
+service("itzg/minecraft-server:adopt11") {
+    name = "zickzack"
     tty = true
 
-    env["DB_USER"] = "test"
+    ports(25565 to 25565)
 
-    volumes {
-        +"/data"
-        +""
-    }
+    mounts(
+        "data" to "/data",
+        "./mods" to "/mods"
+    )
+
+    restart(UNLESS_STOPPED)
+
+    env["DB_HOST"] = "mongodb"
+
+    env(
+        "EULA" to true,
+        "TYPE" to "FABRIC"
+    )
 
     events {
-        onStart {
-            println("Starting container...")
-        }
-        onRestart {
-
+        onFirstStart {
+            // custom logic
         }
     }
-}
-
-volume("data") {
-
 }
