@@ -6,11 +6,19 @@ class Service(
     val tty: Boolean,
     val env: Map<String, String>,
     val events: Events,
+    val mounts: Collection<Mount>,
+    val ports: Map<Int, Int>,
+    val restartPolicy: RestartPolicy?,
 ) {
     class Events(
         val onFirstStart: (() -> Unit)?,
         val onStart: (() -> Unit)?,
         val onRestart: (() -> Unit)?,
         val onStop: (() -> Unit)?,
+    )
+
+    class Mount(
+        val source: String,
+        val target: String,
     )
 }
