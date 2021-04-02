@@ -1,6 +1,6 @@
 package net.axay.whalewarden.script.data
 
-class Service(
+data class Service(
     val image: String,
     val name: String?,
     val tty: Boolean,
@@ -17,7 +17,7 @@ class Service(
         val onStop: (() -> Unit)?,
     )
 
-    class Mount(
+    data class Mount(
         val source: String,
         val target: String,
     )
