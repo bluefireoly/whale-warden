@@ -2,6 +2,7 @@ val jvmVersion = JavaVersion.VERSION_11
 val jvmVersionString = "11"
 
 val ktorVersion = "1.5.2"
+val dockerJavaVersion = "3.2.7"
 
 val entryClass = "net.axay.whalewarden.ManagerKt"
 
@@ -22,8 +23,8 @@ repositories {
 dependencies {
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
 
-    implementation("io.ktor:ktor-client-cio:$ktorVersion")
-    implementation("io.ktor:ktor-client-serialization:$ktorVersion")
+    implementation("com.github.docker-java:docker-java-core:$dockerJavaVersion")
+    implementation("com.github.docker-java:docker-java-transport-httpclient5:$dockerJavaVersion")
 
     implementation("org.slf4j:slf4j-simple:1.7.30")
 }

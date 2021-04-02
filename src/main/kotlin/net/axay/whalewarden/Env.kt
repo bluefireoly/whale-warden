@@ -1,7 +1,9 @@
 package net.axay.whalewarden
 
-import java.lang.System.getenv
-
 object Env {
-    val webhookPath = getenv("WEBHOOK_PATH") ?: "/webhook/update"
+    private fun env(name: String): String? = System.getenv(name)
+
+    val webhookToken = env("WEBHOOK_TOKEN")
+    val webhookPath: String = env("WEBHOOK_PATH") ?: "/webhook/update"
+    val containerNames = env("UPDATE_CONTAINERS")?.split(' ') ?: emptyList()
 }
