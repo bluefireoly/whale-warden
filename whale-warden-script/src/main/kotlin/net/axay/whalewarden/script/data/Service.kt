@@ -20,5 +20,20 @@ data class Service(
     data class Mount(
         val source: String,
         val target: String,
-    )
+        val type: Type,
+        val readOnly: Boolean,
+    ) {
+        enum class Type {
+            VOLUME, BIND,
+        }
+    }
+
+    data class RestartPolicy(
+        val type: Type,
+        val maximumRetryCount: Int,
+    ) {
+        enum class Type {
+            NO_RESTART, ALWAYS, UNLESS_STOPPED, ON_FAILURE
+        }
+    }
 }
