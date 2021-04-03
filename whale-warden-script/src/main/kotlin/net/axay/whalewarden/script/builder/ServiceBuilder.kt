@@ -3,7 +3,6 @@
 package net.axay.whalewarden.script.builder
 
 import net.axay.whalewarden.script.builder.api.Builder
-import net.axay.whalewarden.script.data.RestartPolicy
 import net.axay.whalewarden.script.data.Service
 import net.axay.whalewarden.script.logging.logInfo
 import net.axay.whalewarden.script.registry.Registry
@@ -30,7 +29,7 @@ class ServiceBuilder(
 
         val ports = HashMap<Int, Int>()
 
-        var restartPolicy: RestartPolicy? = null
+        var restartPolicy: Service.RestartPolicy? = null
 
         override fun build() = Service(
             image, name, tty, env, eventBuilder.internalBuilder.build(), mounts, ports, restartPolicy
@@ -132,10 +131,9 @@ class ServiceBuilder(
      * Define the restart policy.
      *
      * @param maxRetryAmount the maximum amount of retries until docker
-     * will give up to restart the container (null for unlimited or undefined)
+     * will give up to restart the container (0 for unlimited or undefined)
      */
-    fun restart(policy: RestartPolicy, maxRetryAmount: Int? = null) {
-        internalBuilder.restartPolicy =
-            RestartPolicy(policy.name, maxRetryAmount ?: policy.maximumRetryCount)
+    fun restart(policy: Service.RestartPolicy.Type, maxRetryAmount: Int = 0) {
+        internalBuilder.restartPolicy = Service.RestartPolicy(policy, maxRetryAmount)
     }
 }
