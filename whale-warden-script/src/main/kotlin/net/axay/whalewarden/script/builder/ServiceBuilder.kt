@@ -3,7 +3,9 @@
 package net.axay.whalewarden.script.builder
 
 import net.axay.whalewarden.script.builder.api.Builder
+import net.axay.whalewarden.script.data.Bind
 import net.axay.whalewarden.script.data.Service
+import net.axay.whalewarden.script.data.Volume
 import net.axay.whalewarden.script.logging.logInfo
 import net.axay.whalewarden.script.registry.Registry
 
@@ -106,11 +108,23 @@ class ServiceBuilder(
     }
 
     /**
-     * Adds all the specified mounts to the host configuration
-     * of the service.
+     * Adds all the specified volume mounts to the host configuration of the service.
      */
-    fun mounts(vararg mounts: Pair<String, String>) {
-        mounts.mapTo(internalBuilder.mounts) { Service.Mount(it.first, it.second) }
+    @JvmName("mountsVolume")
+    fun mounts(vararg mounts: Pair<Volume, String>) {
+        mounts.mapTo(internalBuilder.mounts) {
+            Service.Mount(it.first.name, it.second, Service.Mount.Type.VOLUME, it.first.readOnly == true)
+        }
+    }
+
+    /**
+     * Adds all the specified bind mounts to the host configuration of the service.
+     */
+    @JvmName("mountsBind")
+    fun mounts(vararg mounts: Pair<Bind, String>) {
+        mounts.mapTo(internalBuilder.mounts) {
+            Service.Mount(it.first.path, it.second, Service.Mount.Type.BIND, it.first.readOnly == true)
+        }
     }
 
     /**
