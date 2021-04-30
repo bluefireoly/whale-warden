@@ -1,6 +1,6 @@
 # whale-warden
 
-Whale warden is an easy-to-use Docker container orchestration software. The configuration of whale-warden is done entirely whith Kotlin Script, which opens much more possibilites than a static config file.
+Whale warden is an easy-to-use Docker container orchestration software. The configuration of whale-warden is done entirely with Kotlin Script, which opens much more possibilites than a static config file.
 
 Additionally, it keeps your containers up to date - it does NOT do that by "watching out" for any updates in a specific interval, instead it hosts an extremely lightweight HTTP server providing custom webhooks, which you can use with your CI/CD solution (e.g. with Docker Hub).
 
