@@ -2,6 +2,7 @@ package net.axay.whalewarden.script.builder
 
 import net.axay.whalewarden.script.builder.api.Builder
 import net.axay.whalewarden.script.data.Network
+import net.axay.whalewarden.script.registry.Registry
 
 /**
  * Builds a new network.
@@ -9,8 +10,10 @@ import net.axay.whalewarden.script.data.Network
  * @param name the name of the network
  * @param builder (optional) the [NetworkBuilder]
  */
-inline fun network(name: String, builder: NetworkBuilder.() -> Unit = { }) {
+inline fun network(name: String, builder: NetworkBuilder.() -> Unit = { }): Network {
     val network = NetworkBuilder(name).apply(builder).internalBuilder.build()
+    Registry.networks += network
+    return network
 }
 
 class NetworkBuilder(
