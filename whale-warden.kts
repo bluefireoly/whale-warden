@@ -5,8 +5,8 @@ service("itzg/minecraft-server:adopt11") {
     ports(25565 to 25565)
 
     mounts(
-        "data" to "/data",
-        "./mods" to "/mods"
+        volume("data") to "/data",
+        bind("./test/mods/") to "/mods"
     )
 
     restart(UNLESS_STOPPED)
