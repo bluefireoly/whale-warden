@@ -1,8 +1,5 @@
-val jvmVersion = JavaVersion.VERSION_11
-val jvmVersionString = "11"
-
 val ktorVersion = "1.5.2"
-val dockerJavaVersion = "3.2.7"
+val dockerJavaVersion = "3.2.8"
 
 val entryClass = "net.axay.whalewarden.ManagerKt"
 
@@ -37,11 +34,12 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-script-runtime:$kotlinVersion")
 }
 
-java.sourceCompatibility = jvmVersion
-java.targetCompatibility = jvmVersion
+tasks.withType<JavaCompile> {
+    options.release.set(11)
+}
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions.jvmTarget = jvmVersionString
+    kotlinOptions.jvmTarget = "11"
 }
 
 application {
