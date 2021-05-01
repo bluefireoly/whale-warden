@@ -3,10 +3,8 @@
 package net.axay.whalewarden.script.builder
 
 import net.axay.whalewarden.script.builder.api.Builder
-import net.axay.whalewarden.script.data.Bind
+import net.axay.whalewarden.script.data.Mount
 import net.axay.whalewarden.script.data.Service
-import net.axay.whalewarden.script.data.Volume
-import net.axay.whalewarden.script.logging.logInfo
 import net.axay.whalewarden.script.registry.Registry
 
 /**
@@ -15,10 +13,10 @@ import net.axay.whalewarden.script.registry.Registry
  * @param image the image of the service
  * @param builder the [ServiceBuilder]
  */
-inline fun service(image: String, builder: ServiceBuilder.() -> Unit) {
+inline fun service(image: String, builder: ServiceBuilder.() -> Unit): Service {
     val service = ServiceBuilder(image).apply(builder).internalBuilder.build()
-    logInfo("Built a service: $service")
     Registry.services += service
+    return service
 }
 
 class ServiceBuilder(
@@ -108,23 +106,13 @@ class ServiceBuilder(
     }
 
     /**
-     * Adds all the specified volume mounts to the host configuration of the service.
+     * Adds all the specified mounts to the host configuration of the service.
+     *
+     * The first part of the pair is the mount, the second part of the pair
+     * represents the path inside of the container.
      */
-    @JvmName("mountsVolume")
-    fun mounts(vararg mounts: Pair<Volume, String>) {
-        mounts.mapTo(internalBuilder.mounts) {
-            Service.Mount(it.first.name, it.second, Service.Mount.Type.VOLUME, it.first.readOnly == true)
-        }
-    }
-
-    /**
-     * Adds all the specified bind mounts to the host configuration of the service.
-     */
-    @JvmName("mountsBind")
-    fun mounts(vararg mounts: Pair<Bind, String>) {
-        mounts.mapTo(internalBuilder.mounts) {
-            Service.Mount(it.first.path, it.second, Service.Mount.Type.BIND, it.first.readOnly == true)
-        }
+    fun mounts(vararg mounts: Pair<Mount, String>) {
+        mounts.mapTo(internalBuilder.mounts) { Service.Mount(it.first, it.second) }
     }
 
     /**
