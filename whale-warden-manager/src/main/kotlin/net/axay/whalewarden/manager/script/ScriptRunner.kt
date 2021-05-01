@@ -12,7 +12,7 @@ fun runConfigScript() {
                 import net.axay.whalewarden.script.builder.bind
                 import net.axay.whalewarden.script.builder.volume
                 import net.axay.whalewarden.script.data.Service.RestartPolicy.Type.*
-                import net.axay.whalewarden.script.logging.logInfo
+                import net.axay.whalewarden.common.logging.logInfo
             """.trimIndent()
         )
         append(Env.configFile.readText())

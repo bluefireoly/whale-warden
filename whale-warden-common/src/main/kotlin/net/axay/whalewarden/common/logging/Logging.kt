@@ -1,4 +1,4 @@
-package net.axay.whalewarden.script.logging
+package net.axay.whalewarden.common.logging
 
 /**
  * Logs an information. The implementation of this function may change.
