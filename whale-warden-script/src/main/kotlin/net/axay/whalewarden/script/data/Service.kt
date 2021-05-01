@@ -18,7 +18,7 @@ data class Service(
     )
 
     class Mount(
-        val mount: net.axay.whalewarden.script.data.Mount,
+        val internalMount: net.axay.whalewarden.script.data.Mount,
         val target: String,
     )
 
