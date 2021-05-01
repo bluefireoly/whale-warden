@@ -4,3 +4,6 @@ build/
 
 # IDE
 .idea/
+
+# Project
+test/
