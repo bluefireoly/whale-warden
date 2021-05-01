@@ -1,10 +1,12 @@
 package net.axay.whalewarden.script.builder
 
+import net.axay.whalewarden.common.file.createIfNotExists
 import net.axay.whalewarden.script.builder.api.Builder
 import net.axay.whalewarden.script.data.Bind
 import net.axay.whalewarden.script.data.Mount
 import net.axay.whalewarden.script.data.Volume
 import net.axay.whalewarden.script.registry.Registry
+import java.io.File
 
 /**
  * Builds a new bind.
@@ -43,7 +45,10 @@ class BindBuilder(
     val path: String,
 ) : MountBuilder() {
     inner class Internal : Builder<Bind> {
-        override fun build() = Bind(path, readOnly, consistency, propagation, nonRecursive)
+        override fun build() = Bind(
+            File(path).apply { createIfNotExists() }.absolutePath,
+            readOnly, consistency, propagation, nonRecursive
+        )
     }
 
     /**
