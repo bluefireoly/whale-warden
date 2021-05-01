@@ -2,15 +2,18 @@ package net.axay.whalewarden.manager
 
 import com.github.dockerjava.api.DockerClient
 import com.github.dockerjava.api.command.PullImageResultCallback
+import com.github.dockerjava.api.exception.DockerException
 import com.github.dockerjava.api.model.PullResponseItem
 import com.github.dockerjava.core.DefaultDockerClientConfig
 import com.github.dockerjava.core.DockerClientImpl
 import com.github.dockerjava.httpclient5.ApacheDockerHttpClient
 import kotlinx.coroutines.*
+import net.axay.whalewarden.common.logging.logError
 import net.axay.whalewarden.common.logging.logInfo
 import net.axay.whalewarden.manager.script.applyService
 import net.axay.whalewarden.manager.script.runConfigScript
 import net.axay.whalewarden.script.registry.Registry
+import kotlin.system.exitProcess
 
 val dockerClient: DockerClient = run {
     val config = DefaultDockerClientConfig.createDefaultConfigBuilder()
@@ -29,13 +32,18 @@ suspend fun main() = withContext(Dispatchers.IO) {
     val createJobs = mutableListOf<Job>()
     Registry.services.forEach {
         createJobs += launch {
-            val pullCallback = PullImageResultCallback()
-            dockerClient.pullImageCmd(it.image).exec(pullCallback)
-            pullCallback.awaitCompletion()
-            logInfo("pulled image ${it.image}")
+            try {
+                val pullCallback = PullImageResultCallback()
+                dockerClient.pullImageCmd(it.image).exec(pullCallback)
+                pullCallback.awaitCompletion()
+                logInfo("pulled image ${it.image}")
 
-            dockerClient.createContainerCmd(it.image).applyService(it).exec()
-            logInfo("Created service: ${it.name}")
+                dockerClient.createContainerCmd(it.image).applyService(it).exec()
+                logInfo("Created service: ${it.name}")
+            } catch (exc: DockerException) {
+                exc.logError()
+                exitProcess(-1)
+            }
         }
     }
 
