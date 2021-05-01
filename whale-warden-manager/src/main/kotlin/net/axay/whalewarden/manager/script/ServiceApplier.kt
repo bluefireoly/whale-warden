@@ -2,20 +2,40 @@ package net.axay.whalewarden.manager.script
 
 import com.github.dockerjava.api.command.CreateContainerCmd
 import com.github.dockerjava.api.model.*
+import net.axay.whalewarden.script.data.Bind
+import net.axay.whalewarden.script.data.Mount
 import net.axay.whalewarden.script.data.Service
+import net.axay.whalewarden.script.data.Volume
+import com.github.dockerjava.api.model.Mount as DockerMount
 
 fun CreateContainerCmd.applyService(service: Service) = with(service) {
-    val hostConfig = HostConfig()
-
     if (name != null)
         withName(name)
     withTty(tty)
     withEnv(env.map { "${it.key}=${it.value}" })
+
+    val hostConfig = HostConfig()
+
     if (mounts.isNotEmpty())
         hostConfig.withMounts(mounts.map {
-            Mount().withSource(it.source).withTarget(it.target)
-                .withType(it.type.dockerJavaType)
-                .withReadOnly(it.readOnly)
+            DockerMount().withTarget(it.target).apply {
+                val mount = it.internalMount
+                withSource(mount.source)
+                withType(mount.type.dockerJavaType)
+                withReadOnly(mount.readOnly)
+                when (mount) {
+                    is Bind -> withBindOptions(BindOptions().apply {
+                        if (mount.propagation != null)
+                            withPropagation(mount.propagation!!.dockerJavaType)
+                    })
+                    is Volume -> withVolumeOptions(VolumeOptions().apply {
+                        if (mount.noCopy != null)
+                            withNoCopy(mount.noCopy!!)
+                        if (mount.driver != null)
+                            withDriverConfig(Driver().withName(mount.driver))
+                    })
+                }
+            }
         })
     if (ports.isNotEmpty())
         hostConfig.withPortBindings(
@@ -29,9 +49,18 @@ fun CreateContainerCmd.applyService(service: Service) = with(service) {
     this@applyService
 }
 
-private val Service.Mount.Type.dockerJavaType get() = when (this) {
-    Service.Mount.Type.VOLUME -> MountType.VOLUME
-    Service.Mount.Type.BIND -> MountType.BIND
+private val Mount.Type.dockerJavaType get() = when (this) {
+    Mount.Type.VOLUME -> MountType.VOLUME
+    Mount.Type.BIND -> MountType.BIND
+}
+
+private val Bind.Propagation.dockerJavaType get() = when(this) {
+    Bind.Propagation.PRIVATE -> BindPropagation.PRIVATE
+    Bind.Propagation.RPRIVATE -> BindPropagation.R_PRIVATE
+    Bind.Propagation.SHARED -> BindPropagation.SHARED
+    Bind.Propagation.RSHARED -> BindPropagation.R_SHARED
+    Bind.Propagation.SLAVE -> BindPropagation.SLAVE
+    Bind.Propagation.RSLAVE -> BindPropagation.R_SLAVE
 }
 
 private val Service.RestartPolicy.dockerJavaType get() = when(type) {
