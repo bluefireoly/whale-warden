@@ -17,16 +17,10 @@ data class Service(
         val onStop: (() -> Unit)?,
     )
 
-    data class Mount(
-        val source: String,
+    class Mount(
+        val mount: net.axay.whalewarden.script.data.Mount,
         val target: String,
-        val type: Type,
-        val readOnly: Boolean,
-    ) {
-        enum class Type {
-            VOLUME, BIND,
-        }
-    }
+    )
 
     data class RestartPolicy(
         val type: Type,
